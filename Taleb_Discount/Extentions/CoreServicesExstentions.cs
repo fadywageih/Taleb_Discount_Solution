@@ -12,7 +12,9 @@ namespace Taleb_Discount.Extentions
         {
             Services.AddScoped<IAttachmentService, AttachmentService>();
             Services.AddScoped<IServiceManager, ServiceManager>();
-            Services.AddScoped<IAuthenticationService, AuthenticationService>(); // ← هذا مفقود!
+            Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            Services.AddScoped<IEmailService, EmailService>();
+
 
             Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
             Services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));

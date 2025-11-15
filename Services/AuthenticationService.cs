@@ -3,7 +3,7 @@
 namespace Services
 {
     public class AuthenticationService(UserManager<ApplicationUser> _userManager, IMapper _mapper
-        , IOptions<JwtOptions> options, IAttachmentService _attachmentService,IUnitOfWork _unitOfWork) : IAuthenticationService
+        , IOptions<JwtOptions> options, IAttachmentService _attachmentService,IUnitOfWork _unitOfWork,IEmailService _emailService) : IAuthenticationService
     {
         public async Task<bool> CheckIfEmailExist(string email)
         {
@@ -13,8 +13,7 @@ namespace Services
         public async Task<UserResultDto> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
-            return new UserResultDto(DisplayName: user.Name, Email: user.Email, Token: await CreateTokenAsync(user)
- );
+            return new UserResultDto(DisplayName: user.Name, Email: user.Email, Token: await CreateTokenAsync(user));
         }
         public async Task<UserResultDto> RegisterSchool(SchoolRegisterDto dto)
         {
@@ -59,21 +58,118 @@ namespace Services
                 Token: await CreateTokenAsync(user)
             );
         }
-
-        public Task<UserResultDto> RegisterUniversity(UniversityRegisterDto dto)
+        public async Task<UserResultDto> RegisterUniversity(UniversityRegisterDto dto)
         {
-            throw new NotImplementedException();
-        }
+            if (await _userManager.FindByEmailAsync(dto.Email) != null)
+                throw new Domain.Exceptions.ValidationException(new[] { "Email is already registered." });
+            var user = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                Name = dto.Name,
+                Age = dto.Age,
+                NationalId = dto.NationalId,
+                PhoneNumber = dto.Phone,
+                UserType = "University"
+            };
 
-        public Task<UserResultDto> RegisterVendor(VendorRegisterDto dto)
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                throw new Domain.Exceptions.ValidationException(errors);
+            }
+
+            // رفع صورة بطاقة الهوية الوطنية
+            if (dto.NationalIdFile == null)
+                throw new Domain.Exceptions.ValidationException(new[] { "National ID image is required." });
+
+            var filePath = await _attachmentService.UploadFileAsync(dto.NationalIdFile, "university");
+
+            // إنشاء كيان طالب الجامعة
+            var uniStudent = new UniversityStudent
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                UniversityName = dto.UniversityName,
+                Faculty = dto.Faculty,
+                UniversityEmail = dto.UniversityEmail,
+                Level = dto.Level,
+                NationalIdImagePath = filePath
+            };
+
+            // الحفظ عبر UnitOfWork
+            var uniRepo = _unitOfWork.GetRepository<UniversityStudent, Guid>();
+            await uniRepo.AddAsync(uniStudent);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new UserResultDto(
+                DisplayName: user.Name,
+                Email: user.Email,
+                Token: await CreateTokenAsync(user)
+            );
+        }
+        public async Task<UserResultDto> RegisterVendor(VendorRegisterDto dto)
         {
-            throw new NotImplementedException();
-        }
+            if (await _userManager.FindByEmailAsync(dto.Email) != null)
+                throw new Domain.Exceptions.ValidationException(new[] { "Email is already registered." });
+            var user = new ApplicationUser
+            {
+                UserName = dto.Email,
+                Email = dto.Email,
+                PhoneNumber = dto.Phone,
+                Name = dto.BusinessName,
+                UserType = "Vendor"
+            };
 
+            var result = await _userManager.CreateAsync(user, dto.Password);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToList();
+                throw new Domain.Exceptions.ValidationException(errors);
+            }
+
+            // إنشاء كيان البائع
+            var vendor = new Vendor
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                BusinessName = dto.BusinessName,
+                Description = dto.Description,
+                Address = dto.Address,
+                Address2 = dto.Address2,
+                Website = dto.Website,
+                FacebookUrl = dto.FacebookUrl
+            };
+
+            // الحفظ عبر UnitOfWork
+            var vendorRepo = _unitOfWork.GetRepository<Vendor, Guid>();
+            await vendorRepo.AddAsync(vendor);
+            await _unitOfWork.SaveChangesAsync();
+
+            return new UserResultDto(
+                DisplayName: dto.BusinessName, // اسم العمل كـ DisplayName
+                Email: user.Email,
+                Token: await CreateTokenAsync(user)
+            );
+        }
+        public async Task<UserResultDto> Login(LoginDto loginDto)
+        {
+            //Email is already added to an accounr 
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            if (user == null) throw new UnauthorizedException();
+            //password is correct
+            var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            if (!result) throw new UnauthorizedException();
+            return new UserResultDto(
+                 DisplayName: user.Name ?? user.Email, // Name قد يكون null للبائع؟ لكنك عيّنته
+        Email: user.Email,
+        Token: await CreateTokenAsync(user)
+            );
+        }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var JwtOptions = options.Value;
-            //Private Claims
             var claim = new List<Claim>
             {
                 new Claim(ClaimTypes.Name,user.Name),
@@ -90,12 +186,47 @@ namespace Services
                 issuer: JwtOptions.Issuer,
                 audience: JwtOptions.Audience,
                 claims: claim,
-                expires: DateTime.Now.AddDays(JwtOptions.ExpirationInDays), //الوقت اللي بتقعه
+                expires: DateTime.Now.AddDays(JwtOptions.ExpirationInDays),
                 signingCredentials: creds
 
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
+        public async Task<bool> SendResetPasswordEmail(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return true; 
+            }
+            try
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var resetLink = $"http://localhost:4200/reset-password?email={Uri.EscapeDataString(email)}&token={Uri.EscapeDataString(token)}";
+                var emailMessage = new EmailDto
+                {
+                    To = user.Email,
+                    Subject = "Reset your Password",
+                    Body = $"Please reset your password by clicking here: {resetLink}"
+                };
+                await _emailService.SendEmailAsync(emailMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error sending email: {ex.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> ResetPassword(string email, string token, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return false;
+            }
+            var result = await _userManager.ResetPasswordAsync(user, token, password);
+            return result.Succeeded;
+        }
     }
 }
