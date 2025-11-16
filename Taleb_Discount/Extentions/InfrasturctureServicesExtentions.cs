@@ -16,11 +16,11 @@ namespace Taleb_Discount.Extentions
     {
         public static IServiceCollection AddInfrasturctureServices(this IServiceCollection Services, IConfiguration Configuration)
         {
-            // Add infrastructure services here
-            Services.AddDbContext<ApplicationDbContext>(optionsAction =>
+            Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                optionsAction.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+
             Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 options.Password.RequiredLength = 6;
@@ -28,15 +28,19 @@ namespace Taleb_Discount.Extentions
                 options.Password.RequireUppercase = false;
                 options.User.RequireUniqueEmail = true;
             })
- .AddEntityFrameworkStores<ApplicationDbContext>()
- .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
-            Services.AddSingleton<IConnectionMultiplexer>(Services => ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")!));
+            Services.AddScoped<IVendorRepository, VendorRepository>();
+
+            Services.AddSingleton<IConnectionMultiplexer>(provider =>
+                ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")));
+
             Services.ConfigureJWT(Configuration);
+
             return Services;
         }
-
         public static IServiceCollection ConfigureJWT(this IServiceCollection Services, IConfiguration configuration)
         {
             var jwtOptions = configuration.GetSection("JwtOptions").Get<JwtOptions>();
@@ -56,11 +60,9 @@ namespace Taleb_Discount.Extentions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
                 };
-                options.MapInboundClaims = false;
             });
-
             Services.AddAuthorization();
             return Services;
         }

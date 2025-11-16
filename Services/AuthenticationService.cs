@@ -13,7 +13,7 @@ namespace Services
         public async Task<UserResultDto> GetUserByEmail(string email)
         {
             var user = await _userManager.FindByEmailAsync(email) ?? throw new UserNotFoundException(email);
-            return new UserResultDto(DisplayName: user.Name, Email: user.Email, Token: await CreateTokenAsync(user));
+            return new UserResultDto(DisplayName: user.Name, Email: user.Email, Token: await CreateTokenAsync(user),null);
         }
         public async Task<UserResultDto> RegisterSchool(SchoolRegisterDto dto)
         {
@@ -36,7 +36,6 @@ namespace Services
             {
                 var errors = result.Errors.Select(e => e.Description).ToList();
                 throw new Domain.Exceptions.ValidationException(errors);
-
             }
             var filePath = await _attachmentService.UploadFileAsync(dto.BirthCertificateFile, "school");
             var schoolStudent = new SchoolStudent
@@ -50,12 +49,13 @@ namespace Services
             };
             var schoolRepo = _unitOfWork.GetRepository<SchoolStudent, Guid>();
             await schoolRepo.AddAsync(schoolStudent);
-            await _unitOfWork.SaveChangesAsync(); // ← هذا السطر ضروري جدًا
+            await _unitOfWork.SaveChangesAsync();
 
             return new UserResultDto(
                 DisplayName: user.Name,
                 Email: user.Email,
-                Token: await CreateTokenAsync(user)
+                Token: await CreateTokenAsync(user),
+                UserType: user.UserType // إضافة هذا
             );
         }
         public async Task<UserResultDto> RegisterUniversity(UniversityRegisterDto dto)
@@ -80,13 +80,11 @@ namespace Services
                 throw new Domain.Exceptions.ValidationException(errors);
             }
 
-            // رفع صورة بطاقة الهوية الوطنية
             if (dto.NationalIdFile == null)
                 throw new Domain.Exceptions.ValidationException(new[] { "National ID image is required." });
 
             var filePath = await _attachmentService.UploadFileAsync(dto.NationalIdFile, "university");
 
-            // إنشاء كيان طالب الجامعة
             var uniStudent = new UniversityStudent
             {
                 Id = Guid.NewGuid(),
@@ -98,7 +96,6 @@ namespace Services
                 NationalIdImagePath = filePath
             };
 
-            // الحفظ عبر UnitOfWork
             var uniRepo = _unitOfWork.GetRepository<UniversityStudent, Guid>();
             await uniRepo.AddAsync(uniStudent);
             await _unitOfWork.SaveChangesAsync();
@@ -106,7 +103,8 @@ namespace Services
             return new UserResultDto(
                 DisplayName: user.Name,
                 Email: user.Email,
-                Token: await CreateTokenAsync(user)
+                Token: await CreateTokenAsync(user),
+                UserType: user.UserType // إضافة هذا
             );
         }
         public async Task<UserResultDto> RegisterVendor(VendorRegisterDto dto)
@@ -129,7 +127,6 @@ namespace Services
                 throw new Domain.Exceptions.ValidationException(errors);
             }
 
-            // إنشاء كيان البائع
             var vendor = new Vendor
             {
                 Id = Guid.NewGuid(),
@@ -142,44 +139,48 @@ namespace Services
                 FacebookUrl = dto.FacebookUrl
             };
 
-            // الحفظ عبر UnitOfWork
             var vendorRepo = _unitOfWork.GetRepository<Vendor, Guid>();
             await vendorRepo.AddAsync(vendor);
             await _unitOfWork.SaveChangesAsync();
 
             return new UserResultDto(
-                DisplayName: dto.BusinessName, // اسم العمل كـ DisplayName
+                DisplayName: dto.BusinessName,
                 Email: user.Email,
-                Token: await CreateTokenAsync(user)
+                Token: await CreateTokenAsync(user),
+                UserType: user.UserType // إضافة هذا
             );
         }
         public async Task<UserResultDto> Login(LoginDto loginDto)
         {
-            //Email is already added to an accounr 
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null) throw new UnauthorizedException();
-            //password is correct
+
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
             if (!result) throw new UnauthorizedException();
+
             return new UserResultDto(
-                 DisplayName: user.Name ?? user.Email, // Name قد يكون null للبائع؟ لكنك عيّنته
-        Email: user.Email,
-        Token: await CreateTokenAsync(user)
+                DisplayName: user.Name ?? user.Email,
+                Email: user.Email,
+                Token: await CreateTokenAsync(user),
+                UserType: user.UserType // إضافة هذا
             );
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var JwtOptions = options.Value;
             var claim = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name,user.Name),
-                new Claim(ClaimTypes.Email,user.Email)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // ⬅️ أهم سطر - إضافة User ID
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(ClaimTypes.Email, user.Email)
+    };
+
             var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
                 claim.Add(new Claim(ClaimTypes.Role, role));
             }
+
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtOptions.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
@@ -188,8 +189,8 @@ namespace Services
                 claims: claim,
                 expires: DateTime.Now.AddDays(JwtOptions.ExpirationInDays),
                 signingCredentials: creds
+            );
 
-                );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
         public async Task<bool> SendResetPasswordEmail(string email)
