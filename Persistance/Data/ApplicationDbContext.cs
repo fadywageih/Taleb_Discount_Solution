@@ -16,6 +16,8 @@ namespace Persistance.Data
         public DbSet<SchoolStudent> SchoolStudents { get; set; }
         public DbSet<UniversityStudent> UniversityStudents { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
+        public DbSet<Domain.Entities.Vendor.Branch> Branches { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
