@@ -1,16 +1,19 @@
 ﻿
-namespace Services
-{
-    public class ServiceManager : IServiceManager
+    namespace Services
     {
-        public ServiceManager(
-            IVendorService vendorService,
-            IAuthenticationService authenticationService)
+        public class ServiceManager : IServiceManager
         {
-            VendorService = vendorService;
-            AuthenticationService = authenticationService;
+            public ServiceManager(
+                IVendorService vendorService,
+                IAuthenticationService authenticationService,
+                IProductService productService)
+            {
+                VendorService = vendorService;
+                AuthenticationService = authenticationService;
+                ProductService = productService;
+            }
+            public IAuthenticationService AuthenticationService { get; }
+            public IVendorService VendorService { get; }
+            public IProductService ProductService { get; }
         }
-        public IAuthenticationService AuthenticationService { get; }
-        public IVendorService VendorService { get; }
     }
-}

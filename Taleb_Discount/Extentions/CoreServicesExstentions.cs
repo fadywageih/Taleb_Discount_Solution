@@ -1,5 +1,4 @@
-﻿using Domain.Contracts;
-using Persistance.Repositories;
+﻿
 using RealState.BLL.Common.Services.AttachmentService;
 using Services;
 using ServicesAbstraction;
@@ -14,10 +13,13 @@ namespace Taleb_Discount.Extentions
         {
             Services.AddScoped<IAttachmentService, AttachmentService>();
             Services.AddScoped<IServiceManager, ServiceManager>();
-            Services.AddScoped<IAuthenticationService, AuthenticationService>();
             Services.AddScoped<IEmailService, EmailService>();
-            Services.AddScoped<IImageService, ImageService>();
             Services.AddScoped<IVendorService, VendorService>();
+            Services.AddScoped<IProductService, ProductService>();
+            Services.AddScoped<IAuthenticationService, AuthenticationService>();
+            Services.AddScoped<IExtendedImageService, ImageService>();
+            Services.AddScoped<IImageService>(provider => provider.GetRequiredService<IExtendedImageService>());
+
             Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
             Services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
             return Services;

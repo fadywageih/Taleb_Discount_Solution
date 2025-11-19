@@ -4,5 +4,7 @@
     {
         public IAuthenticationService AuthenticationService { get; }
         public IVendorService VendorService { get; }
+        public IProductService ProductService { get; }
+
     }
 }

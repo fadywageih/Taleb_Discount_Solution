@@ -1,25 +1,38 @@
-﻿using Domain.Contracts;
-using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using Persistance.Data;
+﻿    using Domain.Contracts;
+    using Domain.Entities;
+    using Microsoft.EntityFrameworkCore;
+    using Persistance.Data;
 
-namespace Persistance.Repositories
-{
-    public class GenericRepository<TEntity, Tkey> : IGenericRepository<TEntity, Tkey> where TEntity : BaseEntity<Tkey>
+    namespace Persistance.Repositories
     {
-        private readonly ApplicationDbContext _dbContext;
-
-        public GenericRepository(ApplicationDbContext dbContext)
+        public class GenericRepository<TEntity, Tkey> : IGenericRepository<TEntity, Tkey> where TEntity : BaseEntity<Tkey>
         {
-            _dbContext = dbContext;
-        }
-        public async Task AddAsync(TEntity entity) => await _dbContext.Set<TEntity>().AddAsync(entity);
-        public void Delete(TEntity entity) => _dbContext.Set<TEntity>().Remove(entity);
-        public void Update(TEntity entity) => _dbContext.Set<TEntity>().Update(entity);
-        public async Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false) =>
-            asNoTracking ? await _dbContext.Set<TEntity>().AsNoTracking().ToListAsync()
-            : await _dbContext.Set<TEntity>().ToListAsync();
-        public async Task<TEntity?> GetByIdAsync(Tkey id) => await _dbContext.Set<TEntity>().FindAsync(id);
+            private readonly ApplicationDbContext _dbContext;
 
+            public GenericRepository(ApplicationDbContext dbContext)
+            {
+                _dbContext = dbContext;
+            }
+            public async Task AddAsync(TEntity entity) => await _dbContext.Set<TEntity>().AddAsync(entity);
+            public void Delete(TEntity entity) => _dbContext.Set<TEntity>().Remove(entity);
+            public void Update(TEntity entity) => _dbContext.Set<TEntity>().Update(entity);
+            public async Task<IEnumerable<TEntity>> GetAllAsync(bool asNoTracking = false) =>
+                asNoTracking ? await _dbContext.Set<TEntity>().AsNoTracking().ToListAsync()
+                : await _dbContext.Set<TEntity>().ToListAsync();
+            public async Task<TEntity?> GetByIdAsync(Tkey id) => await _dbContext.Set<TEntity>().FindAsync(id);
+            public async Task<TEntity?> GetByIdAsync(Specifications<TEntity> specifications)
+            {
+                return await ApplySpecifications(specifications).FirstOrDefaultAsync();
+            }
+            public async Task<IEnumerable<TEntity>> GetAllAsync(Specifications<TEntity> specifications)
+            {
+                return await ApplySpecifications(specifications).ToListAsync();
+            }
+            private IQueryable<TEntity> ApplySpecifications(Specifications<TEntity> specifications)
+            {
+                return SpecificationsEvaluator.GetQuery<TEntity>(_dbContext.Set<TEntity>(), specifications);
+            }
+            public Task<int> CountAsync(Specifications<TEntity> specifications) =>
+                ApplySpecifications(specifications).CountAsync();
+        }
     }
-}
