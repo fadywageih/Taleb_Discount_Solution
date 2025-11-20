@@ -37,7 +37,9 @@ namespace Presentation
         [HttpGet("emailexists")]
         public async Task<ActionResult<bool>> CheckEmailExist(string email)
         {
+            Console.WriteLine($"🔍 Checking email: {email}");
             var result = await serviceManager.AuthenticationService.CheckIfEmailExist(email);
+            Console.WriteLine($"✅ Email exists result: {result}");
             return Ok(result);
         }
         [HttpPost("forgot-password")]

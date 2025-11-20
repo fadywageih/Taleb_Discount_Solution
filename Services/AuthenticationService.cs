@@ -162,24 +162,19 @@ namespace Services
                 DisplayName: user.Name ?? user.Email,
                 Email: user.Email,
                 Token: await CreateTokenAsync(user),
-                UserType: user.UserType // إضافة هذا
+                UserType: user.UserType 
             );
         }
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var JwtOptions = options.Value;
             var claim = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()), // ⬅️ أهم سطر - إضافة User ID
-        new Claim(ClaimTypes.Name, user.Name),
-        new Claim(ClaimTypes.Email, user.Email)
-    };
-
-            var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claim.Add(new Claim(ClaimTypes.Role, role));
-            }
+            {new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+             new Claim(ClaimTypes.Name, user.Name),
+             new Claim(ClaimTypes.Email, user.Email),
+             new Claim("UserType", user.UserType),
+            new Claim(ClaimTypes.Role, user.UserType)
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtOptions.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Domain.Entities.Product;
 
 namespace Persistance.Data
 {
@@ -17,7 +18,9 @@ namespace Persistance.Data
         public DbSet<UniversityStudent> UniversityStudents { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
         public DbSet<Domain.Entities.Vendor.Branch> Branches { get; set; }
-
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductBrand> ProductBrands { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

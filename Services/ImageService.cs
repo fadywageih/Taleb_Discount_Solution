@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using System.Text.RegularExpressions;
 
 namespace Services
 {
-    public class ImageService : IImageService
+    public class ImageService : IExtendedImageService
     {
         private readonly IWebHostEnvironment _environment;
         private const string UploadsFolder = "uploads/business-images";
@@ -69,6 +70,67 @@ namespace Services
             {
                 return false;
             }
+        }
+
+        public async Task<string> SaveImageAsync(IFormFile image, string folderName)
+        {
+            if (image == null || image.Length == 0)
+                return null;
+
+            try
+            {
+                var extension = Path.GetExtension(image.FileName);
+                if (string.IsNullOrEmpty(extension) || !IsImageExtension(extension))
+                    return null;
+
+                var fileName = GenerateFileName(extension.Substring(1)); // Remove the dot
+                var uploadsPath = Path.Combine(_environment.WebRootPath, folderName);
+                var filePath = Path.Combine(uploadsPath, fileName);
+
+                // Ensure directory exists
+                if (!Directory.Exists(uploadsPath))
+                    Directory.CreateDirectory(uploadsPath);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await image.CopyToAsync(stream);
+
+                return $"/{folderName}/{fileName}";
+            }
+            catch (Exception ex)
+            {
+                // يمكنك استخدام logger هنا بدل Console
+                return null;
+            }
+        }
+
+        public async Task<bool> DeleteImageAsync(string imageUrl)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(imageUrl))
+                    return false;
+
+                var fileName = Path.GetFileName(imageUrl);
+                // افترض أن الصور محفوظة في uploads/business-images
+                var filePath = Path.Combine(_environment.WebRootPath, UploadsFolder, fileName);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsImageExtension(string extension)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+            return allowedExtensions.Contains(extension.ToLower());
         }
 
         private string GetFileExtension(string imageType)
