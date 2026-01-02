@@ -158,6 +158,13 @@ namespace Services
 
                 await _unitOfWork.SaveChangesAsync();
             }
+
+        }
+        public async Task<IEnumerable<ProductResultDto>> GetProductsByVendorAsync(Guid vendorId)
+        {
+            var spec = new ProductWithCategorySpecifications(vendorId);
+            var products = await _unitOfWork.GetRepository<Product, int>().GetAllAsync(spec);
+            return _mapper.Map<IEnumerable<ProductResultDto>>(products);
         }
     }
 }

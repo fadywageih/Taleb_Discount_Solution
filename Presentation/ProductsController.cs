@@ -59,8 +59,6 @@
         try
         {
             var vendorId = GetCurrentVendorId();
-
-            // احصل على جميع المنتجات الخاصة بهذا الـ Vendor
             var products = await _serviceManager.ProductService.GetVendorProductsAsync(vendorId);
 
             return Ok(products);
@@ -79,8 +77,6 @@
         {
             throw new UnauthorizedAccessException("Invalid user ID");
         }
-
-        // البحث عن الـ Vendor باستخدام الـ User ID
         var vendor = _serviceManager.VendorService.GetVendorByUserIdAsync(userGuid).Result;
 
         if (vendor == null)
@@ -88,6 +84,6 @@
             throw new UnauthorizedAccessException("Vendor profile not found for this user");
         }
 
-        return vendor.Id; // إرجاع الـ Vendor ID وليس الـ User ID
+        return vendor.Id; 
     }
 }
