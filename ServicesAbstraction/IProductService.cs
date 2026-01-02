@@ -14,5 +14,7 @@ namespace ServicesAbstraction
         Task<ProductResultDto> CreateProductAsync(ProductCreateDto productDto, Guid vendorId);
         Task UpdateProductAsync(ProductUpdateDto productDto);
         Task DeleteProductAsync(int id);
+        Task<IEnumerable<ProductResultDto>> GetProductsByVendorAsync(Guid vendorId);
+
     }
 }
