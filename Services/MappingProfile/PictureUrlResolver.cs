@@ -1,10 +1,6 @@
-﻿using Domain.Entities.Product;
-using Microsoft.Extensions.Configuration;
-using Shared.Dtos.Product;
-
-namespace Services.MappingProfile
+﻿namespace Services.MappingProfile
 {
-    public class PictureUrlResolver : IValueResolver<Product, ProductResultDto, string> // تصحيح الإسم
+    public class PictureUrlResolver : IValueResolver<Product, ProductResultDto, string> 
     {
         private readonly IConfiguration _configuration;
 

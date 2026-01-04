@@ -1,7 +1,4 @@
-﻿using Domain.Entities.Product;
-using Shared.Dtos.Product;
-
-namespace Services.MappingProfile
+﻿namespace Services.MappingProfile
 {
     public class ProductProfile : Profile
     {

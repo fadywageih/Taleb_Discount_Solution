@@ -8,17 +8,14 @@ namespace Services
     {
         private readonly IWebHostEnvironment _environment;
         private const string UploadsFolder = "uploads/business-images";
-
         public ImageService(IWebHostEnvironment environment)
         {
             _environment = environment;
         }
-
         public async Task<string> SaveBase64ImageAsync(string base64Image)
         {
             if (string.IsNullOrEmpty(base64Image) || !base64Image.StartsWith("data:image"))
                 return null;
-
             try
             {
                 var match = Regex.Match(base64Image, @"^data:image/(?<type>[a-zA-Z]+);base64,(?<data>.+)$");
@@ -39,7 +36,6 @@ namespace Services
             }
             catch (Exception ex)
             {
-                // يمكنك استخدام logger هنا بدل Console
                 return null;
             }
         }
@@ -86,19 +82,14 @@ namespace Services
                 var fileName = GenerateFileName(extension.Substring(1)); // Remove the dot
                 var uploadsPath = Path.Combine(_environment.WebRootPath, folderName);
                 var filePath = Path.Combine(uploadsPath, fileName);
-
-                // Ensure directory exists
                 if (!Directory.Exists(uploadsPath))
                     Directory.CreateDirectory(uploadsPath);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await image.CopyToAsync(stream);
-
                 return $"/{folderName}/{fileName}";
             }
             catch (Exception ex)
             {
-                // يمكنك استخدام logger هنا بدل Console
                 return null;
             }
         }
@@ -109,11 +100,8 @@ namespace Services
             {
                 if (string.IsNullOrEmpty(imageUrl))
                     return false;
-
                 var fileName = Path.GetFileName(imageUrl);
-                // افترض أن الصور محفوظة في uploads/business-images
                 var filePath = Path.Combine(_environment.WebRootPath, UploadsFolder, fileName);
-
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
@@ -144,24 +132,20 @@ namespace Services
                 _ => "jpg"
             };
         }
-
         private string GenerateFileName(string extension)
         {
             return $"business_{Guid.NewGuid()}.{extension}";
         }
-
         private string GetFilePath(string fileName)
         {
             return Path.Combine(_environment.WebRootPath, UploadsFolder, fileName);
         }
-
         private async Task EnsureDirectoryExists()
         {
             var uploadsPath = Path.Combine(_environment.WebRootPath, UploadsFolder);
             if (!Directory.Exists(uploadsPath))
                 Directory.CreateDirectory(uploadsPath);
         }
-
         private async Task SaveImageFile(string base64Data, string filePath)
         {
             var imageBytes = Convert.FromBase64String(base64Data);

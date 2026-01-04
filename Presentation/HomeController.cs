@@ -11,12 +11,10 @@ namespace Presentation.Controllers
     public class HomeController : ControllerBase
     {
         private readonly IServiceManager _serviceManager;
-
         public HomeController(IServiceManager serviceManager)
         {
             _serviceManager = serviceManager;
         }
-
         [HttpGet]
         [AllowAnonymous]
         public async Task<ActionResult<HomePageDto>> GetHomePageData()
@@ -24,7 +22,6 @@ namespace Presentation.Controllers
             var homeData = await _serviceManager.HomeService.GetHomePageDataAsync();
             return Ok(homeData);
         }
-
         [HttpGet("student")]
         [Authorize(Roles = "School,University")]
         public async Task<ActionResult<HomePageDto>> GetStudentHomePageData()

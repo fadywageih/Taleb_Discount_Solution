@@ -1,8 +1,4 @@
-﻿using Domain.Entities.User;
-using Shared.Dtos.User.Shared.Dtos.Vendor;
-using Shared.Dtos.Vendor;
-
-namespace Services.MappingProfile
+﻿namespace Services.MappingProfile
 {
     public class HomeMappingProfile : Profile
     {
