@@ -1,7 +1,4 @@
-﻿using Domain.Contracts;
-using System.Linq.Expressions;
-
-namespace Services.Specifications
+﻿namespace Services.Specifications
 {
     public class VendorWithUserSpecification : Specifications<Vendor>
     {
@@ -10,13 +7,11 @@ namespace Services.Specifications
         {
             AddInclude(v => v.User);
         }
-
         public VendorWithUserSpecification(Guid vendorId)
             : base(v => v.Id == vendorId)
         {
             AddInclude(v => v.User);
         }
-
         public VendorWithUserSpecification(Expression<Func<Vendor, bool>> criteria)
             : base(criteria)
         {

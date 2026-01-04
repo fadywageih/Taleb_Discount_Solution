@@ -9,7 +9,6 @@ namespace ServicesAbstraction
         Task<UserResultDto> RegisterSchool(SchoolRegisterDto dto);
         Task<UserResultDto> RegisterUniversity(UniversityRegisterDto dto);
         Task<UserResultDto> RegisterVendor(VendorRegisterDto dto);
-        //Get current user
         public Task<UserResultDto> GetUserByEmail(string email);
         public Task<bool> CheckIfEmailExist(string email);
         public Task<bool> SendResetPasswordEmail(string email);

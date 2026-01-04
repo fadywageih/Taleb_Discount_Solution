@@ -1,15 +1,10 @@
-﻿using Domain.Contracts;
-using Domain.Entities.Vendor;
-using Shared.Dtos.Vendor;
-
-namespace Services
+﻿namespace Services
 {
     public class VendorService : IVendorService
     {
         private readonly IVendorRepository _vendorRepository;
         private readonly IImageService _imageService;
         private readonly IMapper _mapper;
-
         public VendorService(IVendorRepository vendorRepository, IImageService imageService, IMapper mapper)
         {
             _vendorRepository = vendorRepository;
@@ -34,7 +29,6 @@ namespace Services
             var vendor = await _vendorRepository.GetVendorByEmailAsync(email);
             return _mapper.Map<VendorDto>(vendor);
         }
-
         public async Task<VendorDto?> UpdateVendorAsync(Guid id, UpdateVendorDto vendorDto)
         {
             var vendor = await _vendorRepository.GetVendorByIdAsync(id);
@@ -48,7 +42,6 @@ namespace Services
             var updatedVendor = await _vendorRepository.UpdateVendorAsync(id, vendor);
             return _mapper.Map<VendorDto>(updatedVendor);
         }
-
         private void UpdateVendorData(Vendor vendor, UpdateVendorDto vendorDto)
         {
             vendor.BusinessName = vendorDto.BusinessName;
@@ -59,7 +52,6 @@ namespace Services
             vendor.FacebookUrl = vendorDto.FacebookUrl;
             vendor.LogoUrl = vendorDto.LogoUrl;
         }
-
         private async Task UpdateBusinessImages(Vendor vendor, UpdateVendorDto vendorDto)
         {
             if (vendorDto.BusinessImages == null || !vendorDto.BusinessImages.Any())
@@ -82,7 +74,6 @@ namespace Services
 
             vendor.BusinessImages = savedImageUrls;
         }
-
         private void UpdateBranches(Vendor vendor, UpdateVendorDto vendorDto)
         {
             if (vendorDto.Branches == null)

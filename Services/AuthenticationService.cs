@@ -1,6 +1,4 @@
-﻿using Domain.Contracts;
-
-namespace Services
+﻿namespace Services
 {
     public class AuthenticationService(UserManager<ApplicationUser> _userManager, IMapper _mapper
         , IOptions<JwtOptions> options, IAttachmentService _attachmentService,IUnitOfWork _unitOfWork,IEmailService _emailService) : IAuthenticationService

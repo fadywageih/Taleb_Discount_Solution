@@ -32,6 +32,7 @@ namespace Taleb_Discount.Extentions
             .AddDefaultTokenProviders();
 
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
             Services.AddScoped<IVendorRepository, VendorRepository>();
 
             Services.AddSingleton<IConnectionMultiplexer>(provider =>

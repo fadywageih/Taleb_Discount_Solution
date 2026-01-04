@@ -1,9 +1,10 @@
-﻿using Domain.Entities.User;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Domain.Entities.FeedBack;
+using Domain.Entities.Product;
+using Domain.Entities.User;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Domain.Entities.Product;
 
 namespace Persistance.Data
 {
@@ -13,7 +14,6 @@ namespace Persistance.Data
             : base(options)
         {
         }
-
         public DbSet<SchoolStudent> SchoolStudents { get; set; }
         public DbSet<UniversityStudent> UniversityStudents { get; set; }
         public DbSet<Vendor> Vendors { get; set; }
@@ -22,9 +22,11 @@ namespace Persistance.Data
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
 
+        public DbSet<FeedBack> FeedBacks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder); // ← مهم جدًا لـ Identity
+            base.OnModelCreating(builder); 
 
              builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

@@ -40,7 +40,7 @@ namespace Taleb_Discount.Extentions
                 options.AddPolicy("CorsPolicy", bulider =>
                 {
                     bulider
-          .WithOrigins("http://localhost:4200", "https://localhost:4200") // أضف كلا البروتوكولين
+          .WithOrigins("http://localhost:4200", "https://localhost:4200") 
           .AllowAnyHeader()
           .AllowAnyMethod()
           .AllowCredentials();

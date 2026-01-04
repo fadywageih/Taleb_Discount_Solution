@@ -1,9 +1,5 @@
-﻿using Domain.Contracts;
-using Services.Specifications;
-using Shared.Dtos.Product;
+﻿using Services.Specifications;
 using Shared.Dtos.User.Shared.Dtos.Home;
-using Shared.Dtos.User.Shared.Dtos.Vendor;
-
 namespace Services
 {
     public class HomeService : IHomeService
@@ -11,14 +7,12 @@ namespace Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IProductService _productService;
-
         public HomeService(IUnitOfWork unitOfWork, IMapper mapper, IProductService productService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _productService = productService;
         }
-
         public async Task<HomePageDto> GetHomePageDataAsync()
         {
             var homeData = new HomePageDto
@@ -31,35 +25,28 @@ namespace Services
 
             return homeData;
         }
-
         public async Task<HomePageDto> GetHomePageDataForStudentAsync(string userType)
         {
             var homeData = await GetHomePageDataAsync();
-
-            // يمكننا إضافة منطق خاص بنوع الطالب إذا احتجنا
-            // مثلاً ترتيب مختلف أو منتجات مخصصة
             if (userType == "School")
             {
                 homeData.FeaturedProducts = homeData.FeaturedProducts
-                    .Where(p => p.CategoryName != "Technology") // مثال
+                    .Where(p => p.CategoryName != "Technology") 
                     .ToList();
             }
-
             return homeData;
         }
-
         private async Task<IEnumerable<ProductResultDto>> GetFeaturedProductsAsync()
         {
             var productSpecs = new ProductParameterSpecifications
             {
-                PageSize = 8, // عدد المنتجات المميزة
+                PageSize = 8,
                 PageIndex = 1
             };
 
             var paginatedProducts = await _productService.GetAllProductsAsync(productSpecs);
-            return paginatedProducts.Data.Take(8); // نأخذ أول 8 منتجات
+            return paginatedProducts.Data.Take(8); 
         }
-
         private async Task<IEnumerable<VendorLogoDto>> GetFeaturedVendorsAsync()
         {
             var vendors = await _unitOfWork.GetRepository<Vendor, Guid>()
@@ -67,7 +54,7 @@ namespace Services
 
             return vendors
                 .Where(v => !string.IsNullOrEmpty(v.LogoUrl))
-                .Take(6) // عدد الفيندورز المميزين
+                .Take(6) 
                 .Select(v => new VendorLogoDto
                 {
                     Id = v.Id,
@@ -76,12 +63,8 @@ namespace Services
                 })
                 .ToList();
         }
-
         private async Task<IEnumerable<AdvertisementDto>> GetActiveAdvertisementsAsync()
         {
-            // هنا يمكن جلب الإعلانات من قاعدة البيانات
-            // حالياً هعمل إعلانات static
-
             return new List<AdvertisementDto>
             {
                 new AdvertisementDto

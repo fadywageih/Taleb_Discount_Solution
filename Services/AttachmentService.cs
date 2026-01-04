@@ -1,7 +1,4 @@
-﻿// RealState.BLL.Common.Services.AttachmentService/AttachmentService.cs
-using Microsoft.AspNetCore.Http;
-using ServicesAbstraction;
-using System.IO;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace RealState.BLL.Common.Services.AttachmentService
 {
@@ -18,18 +15,12 @@ namespace RealState.BLL.Common.Services.AttachmentService
 
             if (file.Length > _maxFileSizeInBytes)
                 throw new Exception("File size exceeds the maximum limit of 3 MB.");
-
-            // ✅ التعديل الوحيد: حفظ داخل wwwroot
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName);
             Directory.CreateDirectory(folderPath);
-
             var fileName = $"{Guid.NewGuid()}{fileExtension}";
             var filePath = Path.Combine(folderPath, fileName);
-
             using var stream = new FileStream(filePath, FileMode.Create);
             await file.CopyToAsync(stream);
-
-            // ✅ هذا الرابط سيعمل الآن
             return $"/uploads/{folderName}/{fileName}";
         }
 
@@ -37,23 +28,17 @@ namespace RealState.BLL.Common.Services.AttachmentService
         {
             if (string.IsNullOrWhiteSpace(folderName) || string.IsNullOrWhiteSpace(fileName))
                 return false;
-
             var ext = Path.GetExtension(fileName).ToLowerInvariant();
             if (!_allowedExtensions.Contains(ext))
                 return false;
-
             if (folderName.Contains("..") || fileName.Contains(".."))
                 return false;
-
-            // ✅ أيضًا غيّر مسار الحذف ليتوافق
             var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", folderName, fileName);
-
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
                 return true;
             }
-
             return false;
         }
     }

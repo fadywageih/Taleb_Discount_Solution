@@ -6,6 +6,6 @@
         public IVendorService VendorService { get; }
         public IProductService ProductService { get; }
         public IHomeService HomeService { get; }
-
+        public IFeedBackService FeedBackService { get; }
     }
 }

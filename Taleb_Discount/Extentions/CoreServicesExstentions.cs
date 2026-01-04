@@ -15,6 +15,7 @@ namespace Taleb_Discount.Extentions
             Services.AddScoped<IServiceManager, ServiceManager>();
             Services.AddScoped<IEmailService, EmailService>();
             Services.AddScoped<IVendorService, VendorService>();
+            Services.AddScoped<IFeedBackService, FeedBackService>();
             Services.AddScoped<IProductService, ProductService>();
             Services.AddScoped<IHomeService, HomeService>();
             Services.AddScoped<IAuthenticationService, AuthenticationService>();

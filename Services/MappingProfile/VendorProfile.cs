@@ -1,7 +1,4 @@
-﻿using Domain.Entities.Vendor;
-using Shared.Dtos.Vendor;
-
-namespace Services.MappingProfile
+﻿namespace Services.MappingProfile
 {
     public class VendorProfile: Profile
     {
