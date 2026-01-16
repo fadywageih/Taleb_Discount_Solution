@@ -7,7 +7,6 @@ global using ServicesAbstraction;
 global using Shared;
 global using Shared.Dtos;
 global using Shared.Dtos.User;
-global using System.ComponentModel.DataAnnotations;
 global using System.IdentityModel.Tokens.Jwt;
 global using System.Security.Claims;
 global using System.Text;
@@ -22,5 +21,13 @@ global using Domain.Entities.Vendor;
 global using Shared.Dtos.Vendor;
 global using Domain.Contracts;
 global using System.Linq.Expressions;
-
-
+global using Domain.Entities.transcation;
+global using Shared.Dtos.Transaction;
+global using Microsoft.AspNetCore.Http;
+global using System.Net;
+global using System.Net.Mail;
+global using Services.Specifications;
+global using Shared.Dtos.User.Shared.Dtos.Home;
+global using Microsoft.AspNetCore.Hosting;
+global using System.Text.RegularExpressions;
+global using Microsoft.Extensions.Logging;

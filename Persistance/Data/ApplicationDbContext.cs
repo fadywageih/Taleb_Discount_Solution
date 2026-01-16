@@ -1,5 +1,6 @@
 ﻿using Domain.Entities.FeedBack;
 using Domain.Entities.Product;
+using Domain.Entities.transcation;
 using Domain.Entities.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace Persistance.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductBrand> ProductBrands { get; set; }
         public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<FeedBack> FeedBacks { get; set; }
 

@@ -20,6 +20,8 @@ namespace Taleb_Discount.Extentions
             Services.AddScoped<IHomeService, HomeService>();
             Services.AddScoped<IAuthenticationService, AuthenticationService>();
             Services.AddScoped<IExtendedImageService, ImageService>();
+            Services.AddScoped<ITransactionService, TransactionService>();
+
             Services.AddScoped<IImageService>(provider => provider.GetRequiredService<IExtendedImageService>());
             Services.AddAutoMapper(typeof(Services.AssemblyReference).Assembly);
             Services.Configure<JwtOptions>(configuration.GetSection("JwtOptions"));
