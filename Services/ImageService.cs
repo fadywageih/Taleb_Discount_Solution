@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System.Text.RegularExpressions;
-
-namespace Services
+﻿namespace Services
 {
     public class ImageService : IExtendedImageService
     {
@@ -21,14 +17,11 @@ namespace Services
                 var match = Regex.Match(base64Image, @"^data:image/(?<type>[a-zA-Z]+);base64,(?<data>.+)$");
                 if (!match.Success)
                     return null;
-
                 var imageType = match.Groups["type"].Value;
                 var base64Data = match.Groups["data"].Value;
-
                 var extension = GetFileExtension(imageType);
                 var fileName = GenerateFileName(extension);
                 var filePath = GetFilePath(fileName);
-
                 await EnsureDirectoryExists();
                 await SaveImageFile(base64Data, filePath);
 
@@ -39,12 +32,10 @@ namespace Services
                 return null;
             }
         }
-
         public string GetImageUrl(string fileName)
         {
             return $"/{UploadsFolder}/{fileName}";
         }
-
         public bool DeleteImage(string imageUrl)
         {
             try
@@ -67,7 +58,6 @@ namespace Services
                 return false;
             }
         }
-
         public async Task<string> SaveImageAsync(IFormFile image, string folderName)
         {
             if (image == null || image.Length == 0)
@@ -78,8 +68,7 @@ namespace Services
                 var extension = Path.GetExtension(image.FileName);
                 if (string.IsNullOrEmpty(extension) || !IsImageExtension(extension))
                     return null;
-
-                var fileName = GenerateFileName(extension.Substring(1)); // Remove the dot
+                var fileName = GenerateFileName(extension.Substring(1));
                 var uploadsPath = Path.Combine(_environment.WebRootPath, folderName);
                 var filePath = Path.Combine(uploadsPath, fileName);
                 if (!Directory.Exists(uploadsPath))
@@ -114,13 +103,11 @@ namespace Services
                 return false;
             }
         }
-
         private bool IsImageExtension(string extension)
         {
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
             return allowedExtensions.Contains(extension.ToLower());
         }
-
         private string GetFileExtension(string imageType)
         {
             return imageType.ToLower() switch

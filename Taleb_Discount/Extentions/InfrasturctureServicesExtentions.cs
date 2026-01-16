@@ -30,10 +30,15 @@ namespace Taleb_Discount.Extentions
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+            Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 
             Services.AddScoped<IUnitOfWork, UnitOfWork>();
             Services.AddScoped<IFeedBackRepository, FeedBackRepository>();
             Services.AddScoped<IVendorRepository, VendorRepository>();
+            Services.AddScoped<IProductRepository, ProductRepository>();
+            Services.AddScoped<ITransactionRepository, TransactionRepository>();
+            Services.AddScoped<IUserRepository, UserRepository>();
+
 
             Services.AddSingleton<IConnectionMultiplexer>(provider =>
                 ConnectionMultiplexer.Connect(Configuration.GetConnectionString("Redis")));

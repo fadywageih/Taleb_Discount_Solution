@@ -1,7 +1,4 @@
-﻿using System.Net;
-using System.Net.Mail;
-
-namespace Services
+﻿namespace Services
 {
     public class EmailService:IEmailService
     {

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-
-namespace RealState.BLL.Common.Services.AttachmentService
+﻿namespace RealState.BLL.Common.Services.AttachmentService
 {
     public class AttachmentService : IAttachmentService
     {

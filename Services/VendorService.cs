@@ -11,19 +11,16 @@
             _imageService = imageService;
             _mapper = mapper;
         }
-
         public async Task<VendorDto?> GetVendorByIdAsync(Guid id)
         {
             var vendor = await _vendorRepository.GetVendorByIdAsync(id);
             return _mapper.Map<VendorDto>(vendor);
         }
-
         public async Task<VendorDto?> GetVendorByUserIdAsync(Guid userId)
         {
             var vendor = await _vendorRepository.GetVendorByUserIdAsync(userId);
             return _mapper.Map<VendorDto>(vendor);
         }
-
         public async Task<VendorDto?> GetVendorByEmailAsync(string email)
         {
             var vendor = await _vendorRepository.GetVendorByEmailAsync(email);
@@ -71,7 +68,6 @@
                 if (!string.IsNullOrEmpty(imageUrl))
                     savedImageUrls.Add(imageUrl);
             }
-
             vendor.BusinessImages = savedImageUrls;
         }
         private void UpdateBranches(Vendor vendor, UpdateVendorDto vendorDto)

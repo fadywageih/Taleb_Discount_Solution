@@ -1,6 +1,4 @@
-﻿using Services.Specifications;
-using Shared.Dtos.User.Shared.Dtos.Home;
-namespace Services
+﻿namespace Services
 {
     public class HomeService : IHomeService
     {

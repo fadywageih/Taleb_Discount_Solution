@@ -166,20 +166,33 @@
         private async Task<string> CreateTokenAsync(ApplicationUser user)
         {
             var JwtOptions = options.Value;
-            var claim = new List<Claim>
-            {new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-             new Claim(ClaimTypes.Name, user.Name),
-             new Claim(ClaimTypes.Email, user.Email),
-             new Claim("UserType", user.UserType),
-            new Claim(ClaimTypes.Role, user.UserType)
-            };
+
+            // إنشاء قائمة الـ Claims الأساسية
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim("UserType", user.UserType), // حفظ الـ UserType الأصلي للـ Frontend
+        new Claim(ClaimTypes.Role, user.UserType) // الـ Role الأساسي (School/University/Vendor)
+    };
+
+            // ⭐⭐⭐ إضافة Role إضافي للطلاب للوصول إلى Transactions ⭐⭐⭐
+            // إذا كان المستخدم School أو University، أضف Role = "User" أيضًا
+            // هذا يسمح لهم بالوصول إلى [Authorize(Roles = "User,School,University")]
+            if (user.UserType == "School" || user.UserType == "University")
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "User"));
+            }
+            // ملاحظة: Vendor يبقى كما هو (Role = "Vendor" فقط)
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JwtOptions.SecretKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: JwtOptions.Issuer,
                 audience: JwtOptions.Audience,
-                claims: claim,
+                claims: claims, // تأكد من استخدام claims (بـ s) وليس claim
                 expires: DateTime.Now.AddDays(JwtOptions.ExpirationInDays),
                 signingCredentials: creds
             );
