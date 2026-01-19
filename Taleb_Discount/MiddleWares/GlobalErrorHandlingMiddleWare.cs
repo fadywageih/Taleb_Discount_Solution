@@ -42,10 +42,6 @@ namespace Taleb_Discount.MiddleWares
 
         private async Task HandleExceptionAsync(HttpContext httpContext, Exception ex)
         {
-            //set content type [application/json]
-
-            //set status code [500]
-            //return standard response  
             httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             var response = new ErrorDetails

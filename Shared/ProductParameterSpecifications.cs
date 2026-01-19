@@ -1,5 +1,4 @@
-﻿// في Shared/ProductParameterSpecifications.cs
-namespace Shared
+﻿namespace Shared
 {
     public class ProductParameterSpecifications
     {

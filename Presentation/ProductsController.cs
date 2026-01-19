@@ -135,16 +135,15 @@ namespace Presentation.Controllers
         {
             try
             {
-                // يمكنك تعديل المعلمات للحصول على المنتجات الأكثر مبيعاً
                 var parameters = new ProductParameterSpecifications
                 {
                     PageIndex = 1,
                     PageSize = 10,
-                    Sort = ProductSortOption.DiscountDesc // أو استخدام معيار آخر
+                    Sort = ProductSortOption.DiscountDesc 
                 };
 
                 var result = await _serviceManager.ProductService.GetAllProductsAsync(parameters);
-                return Ok(result.Data?.Take(8)); // أخذ أفضل 8 منتجات
+                return Ok(result.Data?.Take(8)); 
             }
             catch (Exception ex)
             {
@@ -173,7 +172,6 @@ namespace Presentation.Controllers
                 return StatusCode(500, new { error = ex.Message });
             }
         }
-
         private Guid GetCurrentVendorId()
         {
             var userId = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

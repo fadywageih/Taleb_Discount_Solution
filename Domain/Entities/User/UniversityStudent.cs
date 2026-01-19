@@ -7,8 +7,6 @@
             public string UniversityEmail { get; set; }
             public string NationalIdImagePath { get; set; }
             public int Level { get; set; }
-
-            // العلاقة
             public Guid UserId { get; set; }
             public ApplicationUser User { get; set; }
         }

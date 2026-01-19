@@ -1,5 +1,4 @@
-﻿
-using RealState.BLL.Common.Services.AttachmentService;
+﻿using RealState.BLL.Common.Services.AttachmentService;
 using Services;
 using ServicesAbstraction;
 using Shared;
@@ -8,7 +7,6 @@ namespace Taleb_Discount.Extentions
 {
     public static class CoreServicesExstentions
     {
-        //bulider.Services
         public static IServiceCollection AddCoreServices(this IServiceCollection Services, IConfiguration configuration)
         {
             Services.AddScoped<IAttachmentService, AttachmentService>();

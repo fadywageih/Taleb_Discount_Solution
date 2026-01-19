@@ -13,8 +13,6 @@ namespace Persistance.Data.Configurations
             builder.Property(pc => pc.Name)
                 .IsRequired()
                 .HasMaxLength(100);
-
-            // Seeding البيانات
             builder.HasData(
                 new ProductCategory { Id = 1, Name = "Supplies" },
                 new ProductCategory { Id = 2, Name = "Technology" },

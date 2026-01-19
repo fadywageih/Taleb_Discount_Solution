@@ -8,7 +8,6 @@ namespace Taleb_Discount.Factories
     {
         public static IActionResult CustomValidationErrorResponse(ActionContext context)
         {
-            //Get all error in modelstate
             var errors = context.ModelState
                 .Where(e => e.Value.Errors.Any()).
                 Select(error => new ValidationError
