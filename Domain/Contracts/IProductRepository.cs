@@ -11,13 +11,11 @@ namespace Domain.Contracts
         Task<Product> AddAsync(Product product);
         Task UpdateAsync(Product product);
         Task DeleteAsync(int id);
-
         Task<IEnumerable<Product>> GetProductsByVendorAsync(Guid vendorId);
         Task<IEnumerable<Product>> GetProductsByCategoryAsync(int categoryId);
         Task<IEnumerable<Product>> GetActiveProductsAsync();
         Task<bool> IsProductNameExistAsync(string name, Guid vendorId);
         Task<int> GetProductCountByVendorAsync(Guid vendorId);
-
         Task<IEnumerable<Product>> GetAllAsync(Specifications<Product> specifications);
         Task<int> CountAsync(Specifications<Product> specifications);
     }

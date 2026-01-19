@@ -11,8 +11,6 @@ namespace Persistance.Data.Configurations
             builder.ToTable("Transactions");
 
             builder.HasKey(t => t.Id);
-
-            // Properties
             builder.Property(t => t.TransactionNumber)
                 .IsRequired()
                 .HasMaxLength(50);

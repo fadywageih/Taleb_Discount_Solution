@@ -1,5 +1,4 @@
-﻿
-namespace Shared.Dtos.Vendor
+﻿namespace Shared.Dtos.Vendor
 {
     public class UpdateVendorDto
     {

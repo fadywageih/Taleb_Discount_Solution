@@ -188,7 +188,5 @@ namespace Persistance.Repositories
             return await _context.Transactions
                 .CountAsync(t => t.VendorId == vendorId);
         }
-
-        // الـ CancelByCustomerAsync مش محتاجينه دلوقتي لأننا عملنا الـ Update مباشرة في الـ Service
     }
 }

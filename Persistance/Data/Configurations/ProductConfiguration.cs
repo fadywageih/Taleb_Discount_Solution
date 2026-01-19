@@ -28,13 +28,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Address)
             .IsRequired()
             .HasMaxLength(200);
-
-        // إزالة العلاقة مع Brand
         builder.HasOne(p => p.ProductCategory)
             .WithMany()
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasOne(p => p.Vendor)
             .WithMany()
             .HasForeignKey(p => p.VendorId)

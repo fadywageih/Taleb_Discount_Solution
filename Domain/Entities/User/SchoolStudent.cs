@@ -6,8 +6,6 @@
         public string SchoolName { get; set; }
         public string BirthCertificatePath { get; set; }
         public int Level { get; set; }
-
-        // العلاقة
         public Guid UserId { get; set; }
         public ApplicationUser User { get; set; }
     }

@@ -1,6 +1,4 @@
-﻿
-
-namespace ServicesAbstraction
+﻿namespace ServicesAbstraction
 {
     public interface IImageService
     {
